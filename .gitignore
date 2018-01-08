@@ -57,3 +57,21 @@ typings/
 # dotenv environment variables file
 .env
 
+
+# dependencies
+node_modules
+
+# logs
+npm-debug.log
+
+# Nuxt build
+.nuxt
+
+# Nuxt generate
+dist
+
+# Backpack build
+build
+
+config.yml
+.awspublish*

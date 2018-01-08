@@ -1,0 +1,41 @@
+{
+    "name": "mg-small-cell",
+    "version": "0.1.0",
+    "description": "Map of Small Cell applications in Montgomery County",
+    "author": "Pratheek Rebala <pratheekrebala@gmail.com>",
+    "private": true,
+    "scripts": {
+        "dev": "backpack dev",
+        "build": "nuxt build && backpack build",
+        "generate": "nuxt generate",
+        "start": "cross-env NODE_ENV=production node build/main.js",
+        "precommit": "yarn lint",
+        "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
+        "heroku-postbuild": "npm run build"
+    },
+    "dependencies": {
+        "@nuxtjs/axios": "^4.5.0",
+        "@nuxtjs/google-analytics": "^2.0.2",
+        "axios": "^0.16.2",
+        "cross-env": "^5.0.1",
+        "express": "^4.15.3",
+        "gulp": "^3.9.1",
+        "gulp-awspublish": "^3.3.0",
+        "gulp-rename": "^1.2.2",
+        "nuxt": "^1.0.0-rc11",
+        "pym.js": "^1.3.1",
+        "source-map-support": "^0.4.15"
+    },
+    "devDependencies": {
+        "babel-eslint": "^7.2.3",
+        "backpack-core": "^0.4.1",
+        "eslint": "^4.3.0",
+        "eslint-config-standard": "^10.2.1",
+        "eslint-loader": "^1.9.0",
+        "eslint-plugin-html": "^3.1.1",
+        "eslint-plugin-import": "^2.7.0",
+        "eslint-plugin-node": "^5.1.1",
+        "eslint-plugin-promise": "^3.5.0",
+        "eslint-plugin-standard": "^3.0.1"
+    }
+}

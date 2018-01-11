@@ -1,4 +1,5 @@
 const pkg = require('./package.json');
+const webpack = require('webpack')
 
 module.exports = {
     /*
@@ -64,6 +65,9 @@ module.exports = {
      */
     build: {
         vendor: ['axios'],
+        plugins: [new webpack.ProvidePlugin({
+            'mapboxgl': 'mapbox-gl'
+        })],
         /*
          ** Run ESLINT on save
          */

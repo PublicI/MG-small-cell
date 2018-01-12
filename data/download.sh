@@ -4,3 +4,7 @@ ogr2ogr --debug ON -dsco SPATIALITE=YES -f "SQLite" ACS_5yr.sqlite ACS_2015_5YR_
 ogr2ogr -update -append -f SQLite ACS_5yr.sqlite -nln "broadband" montgomery_county_speeds.csv
 rm ACS.geojson
 ogr2ogr --debug ON -f "GeoJSON" ACS.geojson ACS_5yr.sqlite -sql "$(cat ./subset.sql)"
+mv ACS.geojson ../static/ACS.geojson
+rm Towers_Proposed.geojson
+rm Towers_approved.geojson
+ogr2ogr --debug ON -f "GeoJSON" ../static/Towers_Proposed.geojson `ls ./montgomery_county_towers/proposed*/*.shp | head -n1`

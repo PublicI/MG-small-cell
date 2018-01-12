@@ -11,9 +11,11 @@ module.exports = {
     // add your custom rules here
     rules: {
         'space-infix-ops': ['warn'],
+        'no-multiple-empty-lines': ['warn'],
         'padded-blocks': ['warn'],
         'no-trailing-spaces': ['warn'],
         'no-unused-vars': ['warn'],
+        'comma-spacing': ['warn'],
         'spaced-comment': ['warn'],
         'quotes': ['warn'],
         'indent': ['warn', 4],
@@ -28,7 +30,7 @@ module.exports = {
         semi: [2, 'always'],
         'no-extra-semi': 2,
         'space-before-function-paren': 'off',
-        quotes: [2, 'single', 'avoid-escape']
+        quotes: [2, 'single', 'avoid-escape', ]
     },
     globals: {}
 };

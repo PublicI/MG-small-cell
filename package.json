@@ -19,6 +19,7 @@
         "@turf/turf": "^5.1.6",
         "axios": "^0.16.2",
         "cross-env": "^5.0.1",
+        "d3-scale": "^1.0.7",
         "express": "^4.15.3",
         "gulp": "^3.9.1",
         "gulp-awspublish": "^3.3.0",

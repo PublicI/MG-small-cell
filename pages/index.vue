@@ -8,7 +8,7 @@
         @map-load="mapLoaded"
         access-token='asdfsdf'
         :map-options="{
-            style: 'http://localhost:8081/styles/klokantech-basic/style.json',
+            style: 'http://map-api.time-sandbox.com/styles/positron.json',
             center: [-77.2405, 39.1547],
             height: 100,
             zoom: 6,
@@ -21,13 +21,13 @@
 <script>
 import Mapbox from 'mapbox-gl-vue';
 import * as turf from '@turf/turf';
-import {scaleLinear} from 'd3-scale';
-import {extent} from 'd3-array';
+import * as d3 from 'd3';
+import * as colorScale from 'd3-scale-chromatic';
 
 export default {
     data () {
         let bounds = [[-76.78709599958069, 39.72080199961266], [-77.31156199998628, 39.34846299986759]];
-        let requiredDocs = ['mg-small-cell/Montgomery_County_Dissolve.geojson', 'mg-small-cell/ACS.geojson', 'mg-small-cell/Towers_Rescinded.geojson'];
+        let requiredDocs = ['mg-small-cell/Montgomery_County_Dissolve.geojson', 'mg-small-cell/ACS.geojson', 'mg-small-cell/Mobilitie.geojson'];
         requiredDocs = Promise.all(requiredDocs.map(doc => this.$axios.get(doc)));
         return {
             bounds: bounds,
@@ -38,12 +38,10 @@ export default {
                     let acs = docs[1].data;
                     let proposedTowers = docs[2].data;
 
-                    let providerScale = scaleLinear()
-                    .domain(extent(acs.features.map(d => d.properties.numProviders)))
-                    .range(['#eff3ff','#bdd7e7','#6baed6','#3182bd','#08519c']);
-
                     // map.setMaxBounds(turf.bbox(mask.features[0])); // => This limits panning to the desired area. For some reason this isn't applying uniformly, it cuts off the map briefly.
-                    map.fitBounds(turf.bbox(mask.features[0]));
+                    map.fitBounds(turf.bbox(mask.features[0]), {
+                        animate: false
+                    });
 
                     // This function will create a low opacity mask around Montgomery County to communicate that they can't access the rest of the map;
                     map.addSource('mask', {
@@ -68,48 +66,65 @@ export default {
                         'source': 'mask',
                         'type': 'fill',
                         'paint': {
-                        'fill-color': 'grey',
-                        'fill-opacity': 0.70
+                            'fill-color': '#CCC',
+                            'fill-opacity': 0.6
                         }
                     });
 
-                    map.addLayer({
-                        'id': 'broadbandProviderCount',
-                        'source': 'acs',
-                        'type': 'fill',
-                        'paint': {
-                            'fill-opacity': 0.6,
-                            'fill-color': [
-                                    'interpolate',
-                                    ['exponential', 4],
-                                    ['number', ['get', 'foodstamps']],
-                                    100, '#f1eef6',
-                                    200, '#bdc9e1',
-                                    300, '#74a9cf',
-                                    400, '#045a8d'
-                            ]
-                        }
-                    });
+                    function drawMap(prop) {
+                        let propValues = acs.features.map(d => d.properties[prop]).sort(d3.ascending);
 
-                    map.addLayer({
+                        let colorScheme = colorScale.schemeGnBu[7];
+                        let fillColorArray = [
+                            'interpolate',
+                            ['linear'],
+                            ['number', ['get', prop]]
+                        ];
+
+                        console.log(map.getStyle().layers);
+
+                        colorScheme.forEach((color, index) => {
+                            let currentQuantile = (index + 1) / colorScheme.length;
+                            fillColorArray.push(d3.quantile(propValues, currentQuantile));
+                            fillColorArray.push(color);
+                        });
+                        
+                        map.addLayer({
+                            'id': 'broadbandProviderCount',
+                            'source': 'acs',
+                            'type': 'fill',
+                            'paint': {
+                                'fill-opacity': 0.8,
+                                'fill-color': fillColorArray
+                            }
+                        }, 'place_other');
+
+                        map.addLayer({
+                            'id': 'proposedTowers_circle',
+                            'source': 'proposedTowers',
+                            'type': 'circle',
+                            'paint': {
+                                'circle-radius': 2.9,
+                                'circle-color': 'rgb(250, 98, 150)',
+                                'circle-opacity': 1,
+                                'circle-blur': 0,
+                                'circle-stroke-width': 0.6,
+                                'circle-stroke-color': '#FFF'
+                            }
+                        });
+                    }
+
+                    drawMap('popDensity');
+
+                    /* map.addLayer({
                         'id': 'broadbandProviderCount_stroke',
                         'source': 'acs',
                         'type': 'line',
                         'paint': {
-                            'line-width': 0.3,
-                            'line-opacity': 0.4
+                            'line-width': 0,
+                            'line-opacity': 0.2
                         }
-                    });
-
-                    map.addLayer({
-                        'id': 'proposedTowers_circle',
-                        'source': 'proposedTowers',
-                        'type': 'circle',
-                        'paint': {
-                            'circle-radius': 3,
-                            'circle-color': 'yellow'
-                        }
-                    });    
+                    }); */
                 });
             }
         };
@@ -123,11 +138,16 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 #map {
   width: 100%;
   height: 700px;
 }
+
+#map > div.mapboxgl-control-container > div.mapboxgl-ctrl-top-right > div > button.mapboxgl-ctrl-icon.mapboxgl-ctrl-compass {
+    display: none;
+}
+
 .title {
     margin: 30px 0;
 }

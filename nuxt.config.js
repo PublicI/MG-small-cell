@@ -44,8 +44,8 @@ module.exports = {
     axios: {
         baseURL: process.server
             ? `http://${process.env.HOST || 'localhost'}:${process.env.PORT ||
-                  3000}`
-            : ''
+                  3000}/${pkg.name}/`
+            : `/${pkg.name}/`
     },
     generate: {
         minify: {
@@ -59,7 +59,7 @@ module.exports = {
     router: {
         base: `/${pkg.name}/`
     },
-    css: ['~/assets/css/site.css', '~/assets/css/main.css'],
+    css: ['~/assets/css/site.css', '~/assets/css/main.css', '~/assets/css/mapbox-gl.css'],
     /*
      ** Add axios globally
      */

@@ -83,7 +83,7 @@ export default {
                     source: 'acs',
                     type: 'fill',
                     paint: {
-                        'fill-opacity': 0.8,
+                        'fill-opacity': 0.6,
                         'fill-color': fillColorArray
                     }
                 },

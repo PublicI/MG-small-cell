@@ -7,7 +7,7 @@
         </mapbox>
         <div id='legend' class='legend'>
             <h4 style="margin:0px; line-height:100%;">Population Density</h4>
-            (<small>per sq.mi</small>)
+            (<small>per sq. mi</small>)
             <div v-for="item in legend">
                 <div>
                     <span class='legend-key' :style="'background-color:' + item[1]"></span>
@@ -32,7 +32,7 @@ export default {
             options: {
                 maxZoom: 14,
                 minZoom: 9,
-                style: 'http://map-api.time-sandbox.com/styles/positron.json',
+                style: 'https://s3.amazonaws.com/apps.publicintegrity.org/map-tiles/style.json',
                 center: [-77.20809249981897, 39.144234494486],
                 /*
                 bounds: [
@@ -204,6 +204,7 @@ export default {
 }
 
 .legend h4 {
+  font-size: 16px;
   margin: 0 0 10px;
 }
 
@@ -218,19 +219,16 @@ export default {
   display: inline-block;
   border-radius: 20%;
   width: 10px;
-  height: 10px;
+  height: 12px;
   margin-right: 5px;
 }
 
 
 .legend div span {
+  font-size: 12px;
   display: inline-block;
   margin-right: 5px;
   opacity: 0.8;
-}
-
-.legend div {
-  position: relative;
 }
 
 </style>

@@ -50,7 +50,8 @@ module.exports = {
     generate: {
         minify: {
             collapseWhitespace: false,
-            removeEmptyAttributes: false
+            removeEmptyAttributes: false,
+            minifyJS: false
         }
     },
     /*
@@ -73,6 +74,8 @@ module.exports = {
          */
         extend(config, ctx) {
             if (ctx.isClient) {
+                config.devtool = 'eval';
+                
                 config.module.rules.push({
                     enforce: 'pre',
                     test: /\.(js|vue)$/,

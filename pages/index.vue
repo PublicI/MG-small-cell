@@ -3,7 +3,18 @@
         <mapbox
         @map-load="mapLoaded"
         :accessToken='accessToken'
-        :mapOptions="options" />
+        :mapOptions="options">
+        </mapbox>
+        <div id='legend' class='legend'>
+            <h4 style="margin:0px; line-height:100%;">Population Density</h4>
+            (<small>per sq.mi</small>)
+            <div v-for="item in legend">
+                <div>
+                    <span class='legend-key' :style="'background-color:' + item[1]"></span>
+                    <span>{{Math.round(item[0]*2.59e+6)}}</span>
+                </div>
+            </div>
+        </div>
     </section>
 </template>
 
@@ -17,7 +28,10 @@ export default {
     data() {
         return {
             accessToken: 'asdfsdf',
+            legend: [],
             options: {
+                maxZoom: 14,
+                minZoom: 9,
                 style: 'http://map-api.time-sandbox.com/styles/positron.json',
                 center: [-77.20809249981897, 39.144234494486],
                 /*
@@ -52,12 +66,16 @@ export default {
             ];
 
             // console.log(map.getStyle().layers);
-
+            let fillStops = [];
             colorScheme.forEach((color, index) => {
                 let currentQuantile = (index + 1) / colorScheme.length;
-                fillColorArray.push(d3.quantile(propValues, currentQuantile));
-                fillColorArray.push(color);
+                fillStops.push(d3.quantile(propValues, currentQuantile));
+                fillStops.push(color);
             });
+
+            fillColorArray = fillColorArray.concat(fillStops);
+
+            this.drawLegend(fillStops);
 
             map.addLayer(
                 {
@@ -147,7 +165,13 @@ export default {
         mapLoaded(map) {
             // console.log('Executing after load');
             this.loadData().then(this.drawMap.bind(this, map));
-        }
+        },
+        drawLegend(legend) {
+            for (let i = 0; i < legend.length; i = i + 2) {
+                this.legend.push(legend.slice(i,i+2));
+            }
+            console.log(`Drawing a legend with ${legend.length} stops.`);
+        },
     },
     head() {
         return {
@@ -166,4 +190,47 @@ export default {
 #map .mapboxgl-ctrl-group .mapboxgl-ctrl-compass {
     display: none;
 }
+
+.legend {
+  background-color: #fff;
+  border-radius: 3px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  padding: 10px;
+  position: absolute;
+  right: 10px;
+  top: 470px;
+  z-index: 1;
+}
+
+.legend h4 {
+  margin: 0 0 10px;
+}
+
+.legend p {
+  margin-left: 30px;
+  position: absolute;
+  display: block;
+  top: 0;
+}
+
+.legend-key {
+  display: inline-block;
+  border-radius: 20%;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
+}
+
+
+.legend div span {
+  display: inline-block;
+  margin-right: 5px;
+  opacity: 0.8;
+}
+
+.legend div {
+  position: relative;
+}
+
 </style>

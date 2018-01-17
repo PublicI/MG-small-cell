@@ -6,8 +6,8 @@
         :mapOptions="options">
         </mapbox>
         <div id='legend' class='legend'>
-            <h4 style="margin:0px; line-height:100%;">Population Density</h4>
-            (<small>per sq. mi</small>)
+            <h4 style="margin:0px; line-height:100%;">Population density</h4>
+            <small>per sq. mi</small>
             <div v-for="item in legend">
                 <div style="float:left;">
                     <span class='legend-key' :style="'background-color:' + item[1] + '; width:' + item[2] + 'px;'"></span>
@@ -26,6 +26,7 @@
                 </div>
             </div>
         </div>
+        <small>Sources: 2015 American Community Survey, Mobilitie Inc., OpenStreetMap contributors</small>
     </section>
 </template>
 
@@ -116,6 +117,11 @@ export default {
                 }
             });
         },
+        addAttribution(map) {
+            map.addControl(new this.$mapboxgl.AttributionControl({
+                compact: true
+            }));
+        },
         drawMap(map, docs) {
             let mask = docs[0].data;
             let acs = docs[1].data;
@@ -173,6 +179,7 @@ export default {
             });
 
             this.drawData(map, acs, 'popDensity');
+            this.addAttribution(map);
         },
         mapLoaded(map) {
             // console.log('Executing after load');

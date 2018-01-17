@@ -76,3 +76,4 @@ build
 config.yml
 .awspublish*
 .DS_Store
+/.vscode

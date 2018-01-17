@@ -9,9 +9,20 @@
             <h4 style="margin:0px; line-height:100%;">Population Density</h4>
             (<small>per sq. mi</small>)
             <div v-for="item in legend">
-                <div>
-                    <span class='legend-key' :style="'background-color:' + item[1]"></span>
-                    <span>{{Math.round(item[0]*2.59e+6)}}</span>
+                <div style="float:left;">
+                    <span class='legend-key' :style="'background-color:' + item[1] + '; width:' + item[2] + 'px;'"></span>
+                </div>
+            </div>
+            <div>
+                <div style="clear:both;" v-if="legendTicks.length > 0">
+                        <span :style="'position:relative; left: 0%;'">0</span>
+                        <span :style="'position:relative; left: 35%'">12,500</span>
+                        <span :style="'position:relative; left: 70%'">57,000</span>
+                    <!-- 
+                        <span v-for="item in legendTicks">
+                            <span :style="'margin-left:' + (item[1] - 20) + 'px'">{{item[0]}}</span>
+                        </span>
+                    -->
                 </div>
             </div>
         </div>
@@ -29,6 +40,7 @@ export default {
         return {
             accessToken: 'asdfsdf',
             legend: [],
+            legendTicks: [],
             options: {
                 maxZoom: 14,
                 minZoom: 9,
@@ -168,9 +180,26 @@ export default {
         },
         drawLegend(legend) {
             for (let i = 0; i < legend.length; i = i + 2) {
-                this.legend.push(legend.slice(i,i+2));
+                let legendItem = legend.slice(i,i+2);
+                legendItem[0] = Math.round(legendItem[0] / 3.86102e-7);
+                this.legend.push(legendItem);
             }
-            console.log(`Drawing a legend with ${legend.length} stops.`);
+            let legendScale = d3.scaleLinear()
+            .domain([0, d3.max(this.legend.map(d => d[0]))])
+            .range([5, 150]);
+
+            this.legend = this.legend.map(d => {
+                d.push(legendScale(d[0]));
+                return d;
+            });
+
+            this.legendTicks = [0, 0.5, 1].map((d, i) => {
+                return [d, legendScale.invert(d * 100)];
+            });
+
+            console.log(this.legend);
+            
+            console.log(`Drawing a legend with ${this.legend.length} stops.`);
         },
     },
     head() {
@@ -192,6 +221,7 @@ export default {
 }
 
 .legend {
+  width: 300px;
   background-color: #fff;
   border-radius: 3px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
@@ -199,7 +229,7 @@ export default {
   padding: 10px;
   position: absolute;
   right: 10px;
-  top: 470px;
+  top: 570px;
   z-index: 1;
 }
 
@@ -217,17 +247,14 @@ export default {
 
 .legend-key {
   display: inline-block;
-  border-radius: 20%;
   width: 10px;
   height: 12px;
-  margin-right: 5px;
 }
 
 
 .legend div span {
   font-size: 12px;
   display: inline-block;
-  margin-right: 5px;
   opacity: 0.8;
 }
 

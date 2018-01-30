@@ -155,6 +155,9 @@ export default {
                 animate: false
             });
 
+            map.setMaxBounds(map.getBounds());
+
+
             map.dragRotate.disable();
             map.touchZoomRotate.disableRotation();
 
@@ -246,18 +249,6 @@ export default {
 
 <style>
 
-@media screen and (max-width: 320px) {
-    .legend {
-        right:0px;
-    }
-}
-
-@media screen and (min-width: 320px) {
-    .legend {
-        right: 10px;
-    }
-}
-
 #sourceline {
     margin: 5px;
     line-height: 100%;
@@ -275,10 +266,40 @@ export default {
     stroke-width: 0.6;
     stroke: #fff;
 }
-#map {
-  width: 100%;
-  height: 700px;
+@media screen and (max-width: 320px) {
+    .legend {
+        box-shadow: none;
+        top: 400px;
+        right:0px;
+        padding-left: 8%;
+        padding-top: 5%;
+        border: none;
+    }
+
+    #sourceline {
+     margin-top: 130px;   
+    }
+
+    #map {
+        width: 100%;
+        height: 400px;
+    }
 }
+
+@media screen and (min-width: 320px) {
+    .legend {
+        top: 570px;
+        right: 10px;
+        padding: 10px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    #map {
+        width: 100%;
+        height: 700px;
+    }
+}
+
 #map .mapboxgl-ctrl-group .mapboxgl-ctrl-compass, #map .mapboxgl-ctrl-bottom-right {
     display: none;
 }
@@ -287,11 +308,8 @@ export default {
   width: 300px;
   background-color: #fff;
   border-radius: 3px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
-  padding: 10px;
   position: absolute;
-  top: 570px;
   z-index: 1;
 }
 

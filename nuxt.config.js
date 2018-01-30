@@ -1,5 +1,6 @@
 const pkg = require('./package.json');
 const webpack = require('webpack')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 module.exports = {
     /*
@@ -66,7 +67,8 @@ module.exports = {
      */
     build: {
         vendor: ['axios'],
-        plugins: [new webpack.ProvidePlugin({
+        plugins: [
+        new webpack.ProvidePlugin({
             'mapboxgl': 'mapbox-gl'
         })],
         /*

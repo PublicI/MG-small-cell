@@ -33,10 +33,13 @@
 
 <script>
 import Mapbox from 'mapbox-gl-vue';
-import * as turf from '@turf/turf';
-import * as d3 from 'd3';
+import turfMask from '@turf/mask';
+import pointsWithinPolygon from '@turf/points-within-polygon';
+import bbox from '@turf/bbox';
+import {max as d3Max, quantile as d3Quantile, ascending as d3Ascending} from 'd3-array';
+import {scaleLinear as d3ScaleLinear} from 'd3-scale';
 import * as colorScale from 'd3-scale-chromatic';
-import * as topojson from 'topojson';
+import {feature as topojsonFeature} from 'topojson';
 
 export default {
     data() {
@@ -71,7 +74,7 @@ export default {
         drawData(map, acs, prop) {
             let propValues = acs.features
                 .map(d => d.properties[prop])
-                .sort(d3.ascending);
+                .sort(d3Ascending);
 
             let colorScheme = colorScale.schemeGnBu[7];
             let fillColorArray = [
@@ -84,7 +87,7 @@ export default {
             let fillStops = [];
             colorScheme.forEach((color, index) => {
                 let currentQuantile = (index + 1) / colorScheme.length;
-                fillStops.push(d3.quantile(propValues, currentQuantile));
+                fillStops.push(d3Quantile(propValues, currentQuantile));
                 fillStops.push(color);
             });
 
@@ -131,7 +134,7 @@ export default {
             let acs = docs[1].data;
 
             //console.log(acs);
-            acs = topojson.feature(acs, acs.objects.ACS);
+            acs = topojsonFeature(acs, acs.objects.ACS);
             
             let proposedTowers = docs[2].data;
             let densityFilter = 1000;
@@ -144,14 +147,14 @@ export default {
 
             console.log(`%c Total number of proposed towers: ${proposedTowers.features.length}`, 'background: #222; color: #bada55');
 
-            let proposedRuralTowers = turf.pointsWithinPolygon(proposedTowers, ruralBlockGroups);
+            let proposedRuralTowers = pointsWithinPolygon(proposedTowers, ruralBlockGroups);
             
             console.log(`%c Total number of towers in block groups with less than ${densityFilter} people per sq. mi: ${proposedRuralTowers.features.length}`, 'background: #222; color: #bada55');
 
             // console.log(proposedTowers.features.map(d => d.properties['Mobilitie Candidate ID']).join('\n'));
             
             // map.setMaxBounds(turf.bbox(mask.features[0])); // => This limits panning to the desired area. For some reason this isn't applying uniformly, it cuts off the map briefly.
-            map.fitBounds(turf.bbox(mask.features[0]), {
+            map.fitBounds(bbox(mask.features[0]), {
                 animate: false
             });
 
@@ -162,9 +165,10 @@ export default {
             map.touchZoomRotate.disableRotation();
 
             // This function will create a low opacity mask around Montgomery County to communicate that they can't access the rest of the map;
+
             map.addSource('mask', {
                 type: 'geojson',
-                data: turf.mask(mask.features[0])
+                data: turfMask(mask.features[0])
             });
 
             map.addSource('outline', {
@@ -222,8 +226,8 @@ export default {
                 legendItem[0] = Math.round(legendItem[0] / 3.86102e-7);
                 this.legend.push(legendItem);
             }
-            let legendScale = d3.scaleLinear()
-            .domain([0, d3.max(this.legend.map(d => d[0]))])
+            let legendScale = d3ScaleLinear()
+            .domain([0, d3Max(this.legend.map(d => d[0]))])
             .range([5, 150]);
 
             this.legend = this.legend.map(d => {

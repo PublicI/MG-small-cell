@@ -26,6 +26,8 @@
         "gulp": "^3.9.1",
         "gulp-awspublish": "^3.3.0",
         "gulp-rename": "^1.2.2",
+        "less": "^2.7.3",
+        "less-loader": "^4.0.5",
         "mapbox-gl": "^0.43.0",
         "mapbox-gl-vue": "^1.7.0",
         "mbview": "^1.15.2",

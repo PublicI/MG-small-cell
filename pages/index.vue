@@ -25,8 +25,9 @@
                     -->
                 </div>
             </div>
+            <small><div id="circle"></div>Indicates a proposed Mobilitie small-cell tower.</small>
         </div>
-        <small>Sources: 2015 American Community Survey, Mobilitie Inc., OpenStreetMap contributors</small>
+        <div id="sourceline">Sources: 2011-2015 American Community Survey 5-year estimates, Mobilitie Inc., OpenStreetMap contributors.</div>
     </section>
 </template>
 
@@ -96,12 +97,14 @@ export default {
                     source: 'acs',
                     type: 'fill',
                     paint: {
-                        'fill-opacity': 0.6,
+                        'fill-opacity': 0.7,
                         'fill-color': fillColorArray
                     }
                 },
-                'place_other'
+                'tunnel_motorway_casing'
             );
+            
+            //console.log(map.getStyle().layers);
 
             map.addLayer({
                 id: 'proposedTowers_circle',
@@ -118,15 +121,30 @@ export default {
             });
         },
         addAttribution(map) {
-            map.addControl(new this.$mapboxgl.AttributionControl({
+            /* map.addControl(new this.$mapboxgl.AttributionControl({
                 compact: true
-            }));
+            })); */
         },
         drawMap(map, docs) {
             let mask = docs[0].data;
             let acs = docs[1].data;
             let proposedTowers = docs[2].data;
+            let densityFilter = 1000;
 
+            let ruralBlockGroups = Object.assign({}, acs);
+            
+            ruralBlockGroups.features = ruralBlockGroups.features.filter(d => (d.properties.popDensity/ 3.86102e-7) <= densityFilter);
+            
+            console.log(`%c Total Block Groups: ${acs.features.length} | Block Groups with less than ${densityFilter} people per sq. mi: ${ruralBlockGroups.features.length}`, 'background: #222; color: #bada55');
+
+            console.log(`%c Total number of proposed towers: ${proposedTowers.features.length}`, 'background: #222; color: #bada55');
+
+            let proposedRuralTowers = turf.pointsWithinPolygon(proposedTowers, ruralBlockGroups);
+            
+            console.log(`%c Total number of towers in block groups with less than ${densityFilter} people per sq. mi: ${proposedRuralTowers.features.length}`, 'background: #222; color: #bada55');
+
+            // console.log(proposedTowers.features.map(d => d.properties['Mobilitie Candidate ID']).join('\n'));
+            
             // map.setMaxBounds(turf.bbox(mask.features[0])); // => This limits panning to the desired area. For some reason this isn't applying uniformly, it cuts off the map briefly.
             map.fitBounds(turf.bbox(mask.features[0]), {
                 animate: false
@@ -164,7 +182,7 @@ export default {
                 type: 'fill',
                 paint: {
                     'fill-color': 'white',
-                    'fill-opacity': 0.5
+                    'fill-opacity': 0.6
                 }
             });
 
@@ -177,6 +195,11 @@ export default {
                     'line-color': 'rgb(200,200,200)',
                 }
             });
+
+            map.on('mouseenter', 'acs', function(e) {
+                console.log(e);
+            });
+
 
             this.drawData(map, acs, 'popDensity');
             this.addAttribution(map);
@@ -203,8 +226,6 @@ export default {
             this.legendTicks = [0, 0.5, 1].map((d, i) => {
                 return [d, legendScale.invert(d * 100)];
             });
-
-            console.log(this.legend);
             
             console.log(`Drawing a legend with ${this.legend.length} stops.`);
         },
@@ -219,11 +240,29 @@ export default {
 </script>
 
 <style>
+
+#sourceline {
+    margin: 5px;
+    line-height: 100%;
+    font-size: 80%;
+}
+
+#circle {
+    display: inline-block;
+    margin-right: 3px;
+    width: 7px; height: 7px; 
+    -webkit-border-radius: 25px; 
+    -moz-border-radius: 25px; 
+    border-radius: 25px; 
+    background: rgb(250, 98, 150);
+    stroke-width: 0.6;
+    stroke: #fff;
+}
 #map {
   width: 100%;
   height: 700px;
 }
-#map .mapboxgl-ctrl-group .mapboxgl-ctrl-compass {
+#map .mapboxgl-ctrl-group .mapboxgl-ctrl-compass, #map .mapboxgl-ctrl-bottom-right {
     display: none;
 }
 

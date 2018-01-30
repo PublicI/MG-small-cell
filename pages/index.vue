@@ -36,6 +36,7 @@ import Mapbox from 'mapbox-gl-vue';
 import * as turf from '@turf/turf';
 import * as d3 from 'd3';
 import * as colorScale from 'd3-scale-chromatic';
+import * as topojson from 'topojson';
 
 export default {
     data() {
@@ -58,7 +59,7 @@ export default {
             },
             requiredDocs: [
                 'Montgomery_County_Dissolve.geojson',
-                'ACS.geojson',
+                'ACS.topojson',
                 'Mobilitie.geojson'
             ]
         };
@@ -128,6 +129,10 @@ export default {
         drawMap(map, docs) {
             let mask = docs[0].data;
             let acs = docs[1].data;
+
+            //console.log(acs);
+            acs = topojson.feature(acs, acs.objects.ACS);
+            
             let proposedTowers = docs[2].data;
             let densityFilter = 1000;
 

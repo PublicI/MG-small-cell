@@ -46,7 +46,7 @@ export default {
             legendTicks: [],
             options: {
                 maxZoom: 14,
-                minZoom: 9,
+                minZoom: 8,
                 style: 'https://s3.amazonaws.com/apps.publicintegrity.org/map-tiles/style.json',
                 center: [-77.20809249981897, 39.144234494486],
                 /*
@@ -246,6 +246,18 @@ export default {
 
 <style>
 
+@media screen and (max-width: 320px) {
+    .legend {
+        right:0px;
+    }
+}
+
+@media screen and (min-width: 320px) {
+    .legend {
+        right: 10px;
+    }
+}
+
 #sourceline {
     margin: 5px;
     line-height: 100%;
@@ -279,7 +291,6 @@ export default {
   font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
   padding: 10px;
   position: absolute;
-  right: 10px;
   top: 570px;
   z-index: 1;
 }
